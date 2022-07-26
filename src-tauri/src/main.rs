@@ -4,7 +4,8 @@
 )]
 
 #[tauri::command]
-fn greet(name: &str) -> String {
+fn greet(name: &str, window: tauri::Window) -> String {
+    window.emit("c_event", "aaaaa");
     format!("Hello, {}!", name)
 }
 
