@@ -18,7 +18,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "",
+      "copyright": "lecepin",
       "deb": {
         "depends": []
       },
@@ -30,7 +30,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.lecepin.douyindownloader",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
