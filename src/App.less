@@ -1,1 +1,29 @@
-.App {}
+.App {
+  padding: 20px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  &-topbar {
+    width: 100%;
+    padding-bottom: 20px;
+
+    & > .ant-space-item {
+      &:nth-last-child(3) {
+        flex-grow: 1;
+      }
+    }
+  }
+
+  &-logo {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    & > img {
+      margin-bottom: 10px;
+    }
+  }
+}

@@ -1,136 +1,350 @@
-import { Button, Input, Progress } from "antd";
-import { useEffect, useState } from "react";
-import { throttle } from "lodash";
+import {
+  Button,
+  Input,
+  Space,
+  Select,
+  Popover,
+  Table,
+  message,
+  BackTop,
+} from "antd";
+import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import { listen } from "@tauri-apps/api/event";
 import { open } from "@tauri-apps/api/dialog";
+import { open as openFile } from "@tauri-apps/api/shell";
+
+import {
+  QuestionCircleOutlined,
+  PlaySquareOutlined,
+  GithubFilled,
+  EyeOutlined,
+  DownloadOutlined,
+  CloudDownloadOutlined,
+} from "@ant-design/icons";
+import imgLogo from "./logo.png";
 
 import "./App.less";
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingPersion, setIsLoadingPersion] = useState(false);
+  const [parseType, setParseType] = useState("video");
+  const [url, setUrl] = useState("");
   const [videoInfo, setVideoInfo] = useState([]);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [progress, setProgress] = useState({});
+  const [isParseLoading, setIsParseLoading] = useState(false);
+  const [status, setStatus] = useState({});
+  const [allDownloading, setAllDownloading] = useState(false);
 
-  useEffect(() => {
-    listen(
-      "e_download_progress",
-      throttle(({ payload }) => {
-        setProgress({
-          ...progress,
-          [payload.id]: ~~((payload.current / payload.total) * 100),
-        });
-      }, 300)
-    );
-  }, []);
+  // import { listen } from "@tauri-apps/api/event";
+  // import { throttle } from "lodash";
+  // useEffect(() => {
+  //   listen(
+  //     "e_download_progress",
+  //     throttle(({ payload }) => {}, 300)
+  //   );
+  // }, []);
 
   return (
     <div className="App">
-      <Input className="url" />
-      <Button
-        loading={isLoading}
-        onClick={async () => {
-          setIsLoading(true);
-          const url = document.querySelector(".url").value;
-
-          try {
-            const id = await invoke("get_url_id", { addr: url });
-            const info = await invoke("get_video_info_by_id", { id });
-
-            setVideoInfo([info]);
-          } catch (error) {
-            alert(JSON.stringify(error));
+      <Space className="App-topbar">
+        <span>类型</span>
+        <Popover
+          placement="bottomLeft"
+          content={
+            <div style={{ maxWidth: 520, wordBreak: "break-all" }}>
+              <p>
+                单个视频：如 “9.94 Eho:/ 我把事情拖到最后一分钟做不是因为我懒
+                而是那个时候我更老了 做事情也更成熟了# 叮叮当当舞 # 杰星编舞
+                https://v.douyin.com/2vLYnCp/
+                复制此链接，打开Dou音搜索，直接观看视频！”
+              </p>
+              <hr />
+              <p>
+                用户所有视频：如
+                “https://www.douyin.com/user/MS4wLjABAAAABsXrboCFzZqd2HrqUMBCUmMWRHDqjMdrW0WndNDaFAbO924AWWF7fk8YJUdZYmjk”
+              </p>
+            </div>
           }
-
-          setIsLoading(false);
-        }}
-      >
-        取ID
-      </Button>
-
-      <Button
-        loading={isLoadingPersion}
-        onClick={async () => {
-          const url = document.querySelector(".url").value;
-          setIsLoadingPersion(true);
-          try {
-            const { video_count, uid } = await invoke("get_user_info_by_url", {
-              addr: url,
-            });
+          trigger="hover"
+        >
+          <QuestionCircleOutlined />
+        </Popover>
+        <Select
+          value={parseType}
+          disabled={false}
+          onChange={(value) => setParseType(value)}
+        >
+          <Select.Option key="video">单 个 视 频</Select.Option>
+          <Select.Option key="userVideo">用户所有视频</Select.Option>
+        </Select>
+        <Input
+          placeholder={
+            parseType === "video"
+              ? "请填入分享的视频链接"
+              : "请填入用户的页面网址"
+          }
+          disabled={false}
+          value={url}
+          onChange={({ target }) => {
+            setUrl(target.value);
+          }}
+        ></Input>
+        <Button
+          type="primary"
+          loading={isParseLoading}
+          onClick={async () => {
+            setIsParseLoading(true);
 
             try {
-              const info = await invoke("get_list_by_user_id", {
-                uid,
-                count: video_count,
-                maxCursor: 0,
-              });
-              console.log(info);
-              setVideoInfo(info);
-            } catch (error) {
-              alert(JSON.stringify(error));
-            }
-          } catch (error) {
-            alert(JSON.stringify(error));
-          }
+              if (parseType === "video") {
+                const id = await invoke("get_url_id", { addr: url });
+                const info = await invoke("get_video_info_by_id", { id });
 
-          setIsLoadingPersion(false);
-        }}
-      >
-        取个人视频
-      </Button>
-      <Button>取个人点赞视频</Button>
-      <Button>取个人收藏视频</Button>
-      <Button>取 tag 视频</Button>
-
-      {videoInfo.map((videoInfo) => (
-        <div key={videoInfo.id}>
-          <h3>视频信息</h3>
-          <div>{videoInfo.title}</div>
-          <img
-            style={{ maxWidth: 150, maxHeight: 150 }}
-            src={videoInfo?.cover}
-          />
-          <div>{videoInfo.ratio}</div>
-          <a href={videoInfo.url} target="_blank">
-            {videoInfo.url}
-          </a>
-          <Button
-            onClick={async () => {
-              const dir = await open({ directory: true });
-
-              if (!dir) {
-                return;
-              }
-              const fileName = `${videoInfo.title}${Date.now()}.mp4`;
-              try {
-                setIsDownloading(true);
-                const info = await invoke("download_video", {
-                  url: videoInfo.url,
-                  writePath: dir,
-                  fileName,
-                  id: videoInfo.id,
+                console.log({ info });
+                setVideoInfo([info]);
+              } else {
+                const { video_count, uid } = await invoke(
+                  "get_user_info_by_url",
+                  {
+                    addr: url,
+                  }
+                );
+                const info = await invoke("get_list_by_user_id", {
+                  uid,
+                  count: video_count,
+                  maxCursor: 0,
                 });
-              } catch (error) {
-                alert(JSON.stringify(error));
-              }
 
-              setTimeout(() => {
-                // setProgress({
-                //   ...progress,
-                //   [fileName]: 0,
-                // });
-                // setIsDownloading(false);
-              }, 400);
-            }}
+                console.log({ info });
+                setVideoInfo(info);
+              }
+            } catch (error) {
+              message.error(error);
+            }
+
+            setIsParseLoading(false);
+          }}
+        >
+          解析{parseType === "video" ? "单个视频" : "所有视频"}
+        </Button>
+        <Button
+          icon={<GithubFilled />}
+          onClick={() =>
+            open_url("https://github.com/lecepin/douyin-downloader")
+          }
+        >
+          <b> Star</b>
+        </Button>
+      </Space>
+
+      {videoInfo?.length > 0 ? (
+        <>
+          <div>
+            <Button
+              loading={allDownloading}
+              icon={<CloudDownloadOutlined />}
+              type="primary"
+              ghost
+              onClick={async () => {
+                const dir = await open({ directory: true });
+
+                if (!dir) {
+                  return;
+                }
+
+                setAllDownloading(true);
+
+                for (let _index = 0; _index < videoInfo.length; _index++) {
+                  const { id, title, url } = videoInfo[_index];
+                  const fileName = `${title}${Date.now()}.mp4`;
+
+                  try {
+                    setStatus((status) => ({
+                      ...status,
+                      [id]: {
+                        status: "downloading",
+                      },
+                    }));
+
+                    const filePath = await invoke("download_video", {
+                      url,
+                      writePath: dir,
+                      fileName,
+                      id: id,
+                    });
+
+                    setStatus((status) => ({
+                      ...status,
+                      [id]: {
+                        status: "done",
+                        filePath,
+                      },
+                    }));
+                  } catch (error) {
+                    message.error(error);
+                    setStatus({
+                      ...status,
+                      [id]: null,
+                    });
+                  }
+                }
+
+                setAllDownloading(false);
+              }}
+            >
+              全部下载
+            </Button>
+          </div>
+          <Table
+            sticky
+            rowKey="id"
+            dataSource={videoInfo}
+            columns={[
+              {
+                title: "序号",
+                dataIndex: "index",
+                key: "index",
+                ellipsis: true,
+                width: 80,
+
+                render: (_a, _b, index) => index + 1,
+              },
+              {
+                title: "封面",
+                dataIndex: "cover",
+                key: "cover",
+                render: (value) =>
+                  value ? (
+                    <img
+                      style={{ maxHeight: 100, maxWidth: 100 }}
+                      src={value}
+                    />
+                  ) : null,
+                width: 100,
+              },
+              {
+                title: "标题",
+                dataIndex: "title",
+                key: "title",
+                ellipsis: true,
+              },
+              {
+                title: "分辨率",
+                dataIndex: "ratio",
+                key: "ratio",
+                width: 100,
+                ellipsis: true,
+              },
+              {
+                title: "操作",
+                dataIndex: "action",
+                key: "action",
+                width: "180px",
+                render: (_, { url, title, id }) => (
+                  <div>
+                    {status[id]?.status == "done" ? (
+                      <Button
+                        icon={<EyeOutlined />}
+                        type="primary"
+                        onClick={() => {
+                          status[id].filePath &&
+                            openFile(status[id].filePath).catch(() => {});
+                        }}
+                        size="small"
+                        ghost
+                      >
+                        查看
+                      </Button>
+                    ) : (
+                      <Button
+                        icon={<DownloadOutlined />}
+                        loading={
+                          status[id]?.status == "downloading" || allDownloading
+                        }
+                        type="primary"
+                        size="small"
+                        onClick={async () => {
+                          const fileName = `${title}${Date.now()}.mp4`;
+                          const dir = await open({ directory: true });
+
+                          if (!dir) {
+                            return;
+                          }
+
+                          try {
+                            setStatus({
+                              ...status,
+                              [id]: {
+                                status: "downloading",
+                              },
+                            });
+
+                            const filePath = await invoke("download_video", {
+                              url,
+                              writePath: dir,
+                              fileName,
+                              id: id,
+                            });
+
+                            setStatus({
+                              ...status,
+                              [id]: {
+                                status: "done",
+                                filePath,
+                              },
+                            });
+                          } catch (error) {
+                            message.error(error);
+                            setStatus({
+                              ...status,
+                              [id]: null,
+                            });
+                          }
+                        }}
+                      >
+                        下载
+                      </Button>
+                    )}
+                    &nbsp; &nbsp;
+                    <Button
+                      icon={<PlaySquareOutlined />}
+                      onClick={() => open_url(url)}
+                      size="small"
+                    >
+                      预览
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+            pagination={false}
+          ></Table>
+        </>
+      ) : (
+        <div className="App-logo">
+          <img src={imgLogo} />
+          <Button
+            icon={<GithubFilled />}
+            size="large"
+            onClick={() =>
+              open_url("https://github.com/lecepin/douyin-downloader")
+            }
           >
-            下载
+            <b> Star</b>
           </Button>
-          <Progress type="circle" percent={progress[videoInfo.id] ?? 0} />
-          <hr />
         </div>
-      ))}
+      )}
+
+      <BackTop style={{ left: 50 }} />
     </div>
   );
+}
+
+function open_url(url) {
+  const el = document.createElement("a");
+
+  el.style.display = "none";
+  el.setAttribute("target", "_blank");
+  el.href = url;
+  document.body.appendChild(el);
+  el.click();
+  document.body.removeChild(el);
 }

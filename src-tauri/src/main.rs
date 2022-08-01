@@ -16,6 +16,7 @@ fn main() {
             command::get_user_full_info_by_url,
             command::get_list_by_user_id,
         ])
+        .menu(tauri::Menu::new())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
