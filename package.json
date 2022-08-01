@@ -15,12 +15,6 @@
     "build": "react-app-rewired build",
     "tauri": "tauri"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",
