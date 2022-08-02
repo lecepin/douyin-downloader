@@ -1,9 +1,9 @@
 use async_recursion::async_recursion;
 use futures_util::StreamExt;
-use regex::Regex;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use tauri::regex::Regex;
 
 #[derive(serde::Serialize)]
 pub struct VideoInfo {
