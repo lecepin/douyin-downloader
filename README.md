@@ -5,6 +5,22 @@
 - 支持下载无水印视频
 - 支持下载某个账号号的所有视频
 
+## 下载软件
+
+软件采用 Rust + Tauri 编写，安装包非常小，只有 5MB 左右。
+
+- Windows 下载地址：[douyin-downloader_0.1.0_x64_en-US.msi](https://github.com/lecepin/douyin-downloader/releases/download/v0.1.0/douyin-downloader_0.1.0_x64_en-US.msi)
+- Mac 下载地址：[douyin-downloader_0.1.0_x64.dmg](https://github.com/lecepin/douyin-downloader/releases/download/v0.1.0/douyin-downloader_0.1.0_x64.dmg)
+
+> 国内访问速度慢，可以使用以下加速地址：
+> - Windows 下载地址：[douyin-downloader_0.1.0_x64_en-US.msi](https://github.91chi.fun/https://github.com//lecepin/douyin-downloader/releases/download/v0.1.0/douyin-downloader_0.1.0_x64_en-US.msi)
+> - Mac 下载地址：[douyin-downloader_0.1.0_x64.dmg](https://github.91chi.fun/https://github.com//lecepin/douyin-downloader/releases/download/v0.1.0/douyin-downloader_0.1.0_x64.dmg)
+
+
+## 使用
+
+如下方式使用。
+
 ### 下载单个视频
 
 ![image](https://user-images.githubusercontent.com/11046969/182413296-1a97050c-f7fd-4912-bf09-e064d67c888f.png)
