@@ -1,5 +1,7 @@
 ## 抖音下载器
 
+> 在线解析版本：[https://apis.leping.fun/dy/](https://apis.leping.fun/dy/)，代码在 [php_ver.php](./php_ver.php) 中。
+
 ![image](https://user-images.githubusercontent.com/11046969/182412269-8ac2dee8-fb30-40b1-b4b3-190c99496759.png)
 
 - 支持下载无水印视频
