@@ -15,7 +15,7 @@ $real_id = $match[2];
 
 if ($real_id) {
     $video_info = json_decode(file_get_contents('https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=' . $real_id));
-    $v_url = $video_info->item_list[0]->video->play_addr->url_list[0];
+    $v_url = str_replace('playwm', 'play', $video_info->item_list[0]->video->play_addr->url_list[0]);
     $v_title = $video_info->item_list[0]->desc;
     $v_ratio = $video_info->item_list[0]->video->ratio;
     $v_cover = $video_info->item_list[0]->video->cover->url_list[0];
