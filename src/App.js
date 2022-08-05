@@ -1,28 +1,10 @@
-import {
-  Button,
-  Input,
-  Space,
-  Select,
-  Popover,
-  Table,
-  message,
-  BackTop,
-} from "antd";
+import { Button, Input, Space, Select, Popover, Table, message, BackTop } from "antd";
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import { open as openFile } from "@tauri-apps/api/shell";
-
-import {
-  QuestionCircleOutlined,
-  PlaySquareOutlined,
-  GithubFilled,
-  EyeOutlined,
-  DownloadOutlined,
-  CloudDownloadOutlined,
-} from "@ant-design/icons";
+import { QuestionCircleOutlined, PlaySquareOutlined, GithubFilled, EyeOutlined, DownloadOutlined, CloudDownloadOutlined } from "@ant-design/icons";
 import imgLogo from "./logo.png";
-
 import "./App.less";
 
 export default function App() {
@@ -33,15 +15,6 @@ export default function App() {
   const [status, setStatus] = useState({});
   const [allDownloading, setAllDownloading] = useState(false);
 
-  // import { listen } from "@tauri-apps/api/event";
-  // import { throttle } from "lodash";
-  // useEffect(() => {
-  //   listen(
-  //     "e_download_progress",
-  //     throttle(({ payload }) => {}, 300)
-  //   );
-  // }, []);
-
   return (
     <div className="App">
       <Space className="App-topbar">
@@ -50,17 +23,9 @@ export default function App() {
           placement="bottomLeft"
           content={
             <div style={{ maxWidth: 520, wordBreak: "break-all" }}>
-              <p>
-                单个视频：如 “9.94 Eho:/ 我把事情拖到最后一分钟做不是因为我懒
-                而是那个时候我更老了 做事情也更成熟了# 叮叮当当舞 # 杰星编舞
-                https://v.douyin.com/2vLYnCp/
-                复制此链接，打开Dou音搜索，直接观看视频！”
-              </p>
+              <p>单个视频：如 “9.94 Eho:/ 我把事情拖到最后一分钟做不是因为我懒而是那个时候我更老了 做事情也更成熟了# 叮叮当当舞 # 杰星编舞 https://v.douyin.com/2vLYnCp/ 复制此链接，打开Dou音搜索，直接观看视频！”</p>
               <hr />
-              <p>
-                用户所有视频：如
-                “https://www.douyin.com/user/MS4wLjABAAAABsXrboCFzZqd2HrqUMBCUmMWRHDqjMdrW0WndNDaFAbO924AWWF7fk8YJUdZYmjk”
-              </p>
+              <p>用户所有视频：如“https://www.douyin.com/user/MS4wLjABAAAABsXrboCFzZqd2HrqUMBCUmMWRHDqjMdrW0WndNDaFAbO924AWWF7fk8YJUdZYmjk”</p>
             </div>
           }
           trigger="hover"
@@ -76,16 +41,10 @@ export default function App() {
           <Select.Option key="userVideo">用户所有视频</Select.Option>
         </Select>
         <Input
-          placeholder={
-            parseType === "video"
-              ? "请填入分享的视频链接"
-              : "请填入用户的页面网址"
-          }
+          placeholder={ parseType === "video" ? "请填入分享的视频链接" : "请填入用户的页面网址" }
           disabled={false}
           value={url}
-          onChange={({ target }) => {
-            setUrl(target.value);
-          }}
+          onChange={({ target }) => { setUrl(target.value); }}
         ></Input>
         <Button
           type="primary"
@@ -98,22 +57,11 @@ export default function App() {
                 const id = await invoke("get_url_id", { addr: url });
                 const info = await invoke("get_video_info_by_id", { id });
 
-                console.log({ info });
                 setVideoInfo([info]);
               } else {
-                const { video_count, uid } = await invoke(
-                  "get_user_info_by_url",
-                  {
-                    addr: url,
-                  }
-                );
-                const info = await invoke("get_list_by_user_id", {
-                  uid,
-                  count: video_count,
-                  maxCursor: 0,
-                });
+                const { video_count, uid } = await invoke("get_user_info_by_url", { addr: url, });
+                const info = await invoke("get_list_by_user_id", { uid, count: video_count, maxCursor: 0 });
 
-                console.log({ info });
                 setVideoInfo(info);
               }
             } catch (error) {
@@ -127,9 +75,7 @@ export default function App() {
         </Button>
         <Button
           icon={<GithubFilled />}
-          onClick={() =>
-            open_url("https://github.com/lecepin/douyin-downloader")
-          }
+          onClick={() => open_url("https://github.com/lecepin/douyin-downloader") }
         >
           <b> Star</b>
         </Button>
@@ -204,7 +150,6 @@ export default function App() {
                 key: "index",
                 ellipsis: true,
                 width: 80,
-
                 render: (_a, _b, index) => index + 1,
               },
               {
@@ -332,7 +277,6 @@ export default function App() {
           </Button>
         </div>
       )}
-
       <BackTop style={{ left: 50 }} />
     </div>
   );
@@ -340,7 +284,6 @@ export default function App() {
 
 function open_url(url) {
   const el = document.createElement("a");
-
   el.style.display = "none";
   el.setAttribute("target", "_blank");
   el.href = url;
