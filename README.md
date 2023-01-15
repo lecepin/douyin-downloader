@@ -3,7 +3,11 @@
 ⚠ 接口挂了，暂时没时间更新软件了。着急下载的话，可以直接在 电脑 浏览器查看抖音，进入 Devtools，执行以下代码进行下载：
 
 ```js
-open(document.querySelector('video').children[0].src)
+open(
+  document.querySelectorAll("video")[
+    document.querySelectorAll("video").length == 1 ? 0 : 1
+  ].children[0].src
+);
 ```
 ---
 
