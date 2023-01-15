@@ -1,5 +1,12 @@
 ## 抖音下载器
 
+⚠ 接口挂了，暂时没时间更新软件了。着急下载的话，可以直接在 电脑 浏览器查看抖音，进入 Devtools，执行以下代码进行下载：
+
+```js
+open(document.querySelector('video').children[0].src)
+```
+---
+
 > 在线解析版本：[https://apis.leping.fun/dy/](https://apis.leping.fun/dy/)，代码在 [php_ver.php](./php_ver.php) 中。
 
 ![image](https://user-images.githubusercontent.com/11046969/182412269-8ac2dee8-fb30-40b1-b4b3-190c99496759.png)
